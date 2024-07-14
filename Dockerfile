@@ -1,4 +1,4 @@
-FROM openjdk:21-slim
+FROM openjdk:17-slim
 MAINTAINER ruslan
 WORKDIR /app
 COPY ./build/libs/*.jar app-file-service.jar
