@@ -1,7 +1,9 @@
 package kz.bitlab.portal.minio.minioservice.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 @Table(name="t_file")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UploadFile {
 
     @Id
