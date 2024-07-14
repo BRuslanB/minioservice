@@ -1,0 +1,31 @@
+server:
+  port: 8000
+
+minio:
+  url: http://localhost:9000
+  user: root
+  password: admin_2024
+  bucket: dev-bucket
+
+spring:
+
+  application:
+    name: minioservice
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+
+  datasource:
+#    url: jdbc:postgresql://localhost:5432/file_db
+    url: jdbc:postgresql://db_postgres:5432/file_db
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml

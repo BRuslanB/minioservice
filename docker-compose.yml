@@ -1,0 +1,58 @@
+version: '3.9'
+services:
+  minio-service:
+    image: quay.io/minio/minio
+    container_name: 'minio_service_container'
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: admin_2024
+    command: server /data --console-address ":9001"
+
+  minio-setup:
+    image: minio/mc
+    depends_on:
+      - minio-service
+    environment:
+      MC_HOST: http://root:admin_2024@minio-service:9000
+
+    entrypoint: >
+      /bin/sh -c "
+        echo Starting Minio...
+        mc alias set minio http://minio-service:9000 root admin_2024;
+        mc mb minio/dev-bucket;
+        exit 0;
+      "
+  minio-db:
+    image: 'postgres:alpine'
+    container_name: 'minio-db-postgres'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=file_db
+    ports:
+      - 2345:5432
+
+  file-service:
+#    build:
+#      context: .
+    image: 'bruslanb/app-file-service-image:1.0.1' # use image from docker hub
+    container_name: 'app-file-service-container'
+    user: '1001:1001' # specify the UID and GID of the user you want to run the container as
+    depends_on:
+      - minio-db
+    environment:
+      - SERVER_PORT=8888
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://minio-db:5432/file_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+      - SPRING_JPA_SHOW_SQL=true
+      - MINIO_URL=http://minio-service:9000
+      - MINIO_USER=root
+      - MINIO_PASSWORD=admin_2024
+      - MINIO_BUCKET=dev-bucket
+    ports:
+      - 8001:8888
